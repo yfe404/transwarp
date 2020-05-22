@@ -1,6 +1,7 @@
 * youtube-music-batch-downloader
 
-<p align="center"><img src="images/zun_is_not_dead.jpg" width="200"/></p>
+#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
+[[./images/zun_is_not_dead.jpg]]
 
 
 ** Installation
