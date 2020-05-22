@@ -32,6 +32,8 @@ Place the geckodriver binary in the =venv/bin= folder or anywhere that is in the
 
 
 ** Usage 
+1. Fill the example_song_list.txt file with your track list (use the same format aka =song|artist=, one per line)
+2. run =python main.py=, this will open the browser to find the URL of the song on YouTube Music and then download the mp3 using =youtube-dl=.
 
 
 
