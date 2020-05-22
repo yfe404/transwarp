@@ -39,6 +39,11 @@ Place the geckodriver binary in the =venv/bin= folder or anywhere that is in the
 2. run =python main.py=, this will open the browser to find the URL of the song on YouTube Music and then download the mp3 using =youtube-dl=.
 
 
+** Disclaimer
+Downloading copyrighted songs may be illegal in your country. This tool is for educational purposes bla bla bla... Please support the artists by buying their music.
+
+
+
 
 
 
