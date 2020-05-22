@@ -3,22 +3,22 @@
 
 ** Installation
 
-0. Be sure to have Firefox and Python 3.6+ installed.
+Be sure to have Firefox and Python 3.6+ installed.
 
 
-1. Create a virtualenv 
+*** Create a virtualenv 
 
 #+BEGIN_SRC sh
 python -m venv venv
 #+END_SRC
 
-2. Source env
+*** Source env
 
 #+BEGIN_SRC sh
 source venv/bin/activate
 #+END_SRC
 
-3. Download requirements 
+*** Download requirements 
 
 #+BEGIN_SRC sh
 pip install -r requirements.txt
@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 /!\ Be sure to always have the last version of =youtube-dl=.
 
-4. Download [[https://github.com/mozilla/geckodriver/releases][geckodriver]] 
+*** Download [[https://github.com/mozilla/geckodriver/releases][geckodriver]] 
 
 Place the geckodriver binary in the =venv/bin= folder or anywhere that is in the =PATH=.
 
