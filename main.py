@@ -1,8 +1,10 @@
+from __future__ import unicode_literals
+
 import os
 import json
-import subprocess
 import logging
 import urllib.parse
+import youtube_dl
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -71,20 +73,36 @@ with open("./example_song_list.txt", "r") as f:
         if pos != -1:
             song_url = song_url[:pos]
 
+        class MyLogger(object):
+            def debug(self, msg):
+                pass
+
+            def warning(self, msg):
+                pass
+
+            def error(self, msg):
+                print(msg)
+
+        def my_hook(d):
+            if d["status"] == "finished":
+                print("Done downloading, now converting ...")
+
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }
+            ],
+            "logger": MyLogger(),
+            "progress_hooks": [my_hook],
+        }
+
         try:
-            subprocess.run(
-                [
-                    "youtube-dl",
-                    "-f",
-                    "bestaudio",
-                    "--extract-audio",
-                    "--audio-format",
-                    "mp3",
-                    "--audio-quality",
-                    "0",
-                    song_url,
-                ],
-                check=True,
-            )
-        except:
-            pass  # @todo log error
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([song_url])
+
+        except Exception as e:
+            print(e)  # @todo log error
