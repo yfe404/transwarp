@@ -5,19 +5,71 @@ import json
 import logging
 import urllib.parse
 import youtube_dl
+from retrying import retry
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
-from time import sleep
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 
 options = Options()
 # options.headless = True
 driver = webdriver.Firefox(options=options)
+
+
+class ContentNotFound(Exception):
+    pass
+
+
+@retry(stop_max_delay=30000)  ## 30 seconds
+def find_song_url(query):
+    """
+    Use Selenium to go to YouTube Music and search for a song
+    
+    :param query: The query describing the song to look for (exemple artist and title)
+    :return: The URL of the song on YouTube Music to be sent to youtube-dl
+    """
+    url = "https://music.youtube.com/search?" + urllib.parse.urlencode({"q": query})
+
+    driver.get(url)
+    buttons = None
+
+    while buttons is None or len(buttons) == 0:
+        buttons = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located(
+                (By.CLASS_NAME, "ytmusic-chip-cloud-chip-renderer")
+            )
+        )
+
+    filter_by_songs = None
+    for button in buttons:
+        if "Songs" in button.text:
+            filter_by_songs = button
+    if filter_by_songs is None:
+        raise ContentNotFound()
+
+    filter_by_songs.click()
+
+    css_selector = "ytmusic-responsive-list-item-renderer.style-scope:nth-child(1) > div:nth-child(2) > ytmusic-item-thumbnail-overlay-renderer:nth-child(5) > div:nth-child(2) > ytmusic-play-button-renderer:nth-child(1) > div:nth-child(1) > yt-icon:nth-child(1)"
+
+    res = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, css_selector))
+    )
+
+    res.click()
+
+    song_url = driver.current_url
+
+    if "watch" not in song_url:
+        raise ContentNotFound()
+
+    return song_url
 
 
 with open("./example_song_list.txt", "r") as f:
@@ -28,47 +80,8 @@ with open("./example_song_list.txt", "r") as f:
 
     for song in songs:
         query = f"{song[0]} {song[1]}"
-        print(query)
 
-        url = "https://music.youtube.com/search?" + urllib.parse.urlencode({"q": query})
-
-        content_loaded = False  # indicates if the url had been updated to show the correct url to pass to youtube-dl (aka the one containing the video id)
-
-        while content_loaded != True:
-            driver.get(url)
-            buttons = None
-
-            while buttons is None or len(buttons) == 0:
-                sleep(1)
-                buttons = driver.find_elements_by_class_name(
-                    "ytmusic-chip-cloud-chip-renderer"
-                )
-                print("======================")
-
-            sleep(3)
-            filter_by_songs = None
-            for button in buttons:
-                if "Songs" in button.text:
-                    filter_by_songs = button
-                    content_loaded = True
-            if filter_by_songs is None:
-                content_loaded = False
-
-            filter_by_songs.click()
-            sleep(2)
-
-            css_selector = "ytmusic-responsive-list-item-renderer.style-scope:nth-child(1) > div:nth-child(2) > ytmusic-item-thumbnail-overlay-renderer:nth-child(5) > div:nth-child(2) > ytmusic-play-button-renderer:nth-child(1) > div:nth-child(1) > yt-icon:nth-child(1)"
-
-            res = driver.find_element_by_css_selector(css_selector)
-
-            res.click()
-
-            song_url = driver.current_url
-
-            if "watch" not in song_url:
-                content_loaded = False
-            print(f"========================{song_url}======================")
-
+        song_url = find_song_url(query)
         pos = song_url.find("&list")
         if pos != -1:
             song_url = song_url[:pos]
