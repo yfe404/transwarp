@@ -13,6 +13,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from config import youtube_config
+
 logging.basicConfig(
     level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -86,34 +88,8 @@ with open("./example_song_list.txt", "r") as f:
         if pos != -1:
             song_url = song_url[:pos]
 
-        class MyLogger(object):
-            def debug(self, msg):
-                pass
-
-            def warning(self, msg):
-                pass
-
-            def error(self, msg):
-                print(msg)
-
-        def my_hook(d):
-            if d["status"] == "finished":
-                print("Done downloading, now converting ...")
-
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "320",
-                }
-            ],
-            "logger": MyLogger(),
-            "progress_hooks": [my_hook],
-        }
-
         try:
+            ydl_opts = youtube_config.get_youtube_config()
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([song_url])
 
