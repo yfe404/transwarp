@@ -3,15 +3,11 @@ from __future__ import unicode_literals
 import os
 import json
 import logging
+import requests
 import urllib.parse
 import youtube_dl
+import json
 from retrying import retry
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 from config import youtube_config
 
@@ -20,59 +16,31 @@ logging.basicConfig(
 )
 
 
-options = Options()
-# options.headless = True
-driver = webdriver.Firefox(options=options)
 
-
-class ContentNotFound(Exception):
-    pass
-
-
-@retry(stop_max_delay=30000)  ## 30 seconds
 def find_song_url(query):
     """
     Use Selenium to go to YouTube Music and search for a song
-    
+
     :param query: The query describing the song to look for (exemple artist and title)
     :return: The URL of the song on YouTube Music to be sent to youtube-dl
     """
-    url = "https://music.youtube.com/search?" + urllib.parse.urlencode({"q": query})
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Origin': 'null',
+        'Connection': 'keep-alive',
+        'Cookie': 'categories=general; language=en-US; locale=en; autocomplete=; image_proxy=; method=POST; safesearch=0; theme=oscar; results_on_new_tab=0; doi_resolver=oadoi.org; oscar-style=logicodev; disabled_engines="btdigg__music\054mixcloud__music\054soundcloud__music\054invidious__music\054seedpeer__music\054deezer__music\054genius__music\054torrentz__music\054piratebay__music"; enabled_engines=; disabled_plugins=; enabled_plugins=; tokens=',
+        'Upgrade-Insecure-Requests': '1'
 
-    driver.get(url)
-    buttons = None
+    }
 
-    while buttons is None or len(buttons) == 0:
-        buttons = WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located(
-                (By.CLASS_NAME, "ytmusic-chip-cloud-chip-renderer")
-            )
-        )
+    data = f"category_general=1&{urllib.parse.urlencode({'q': query})}&pageno=1&time_range=None&language=en-US&format=json"
 
-    filter_by_songs = None
-    for button in buttons:
-        if "Songs" in button.text:
-            filter_by_songs = button
-    if filter_by_songs is None:
-        raise ContentNotFound()
-
-    filter_by_songs.click()
-
-    css_selector = "ytmusic-responsive-list-item-renderer.style-scope:nth-child(1) > div:nth-child(2) > ytmusic-item-thumbnail-overlay-renderer:nth-child(5) > div:nth-child(2) > ytmusic-play-button-renderer:nth-child(1) > div:nth-child(1) > yt-icon:nth-child(1)"
-
-    res = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, css_selector))
-    )
-
-    res.click()
-
-    song_url = driver.current_url
-
-    if "watch" not in song_url:
-        raise ContentNotFound()
-
-    return song_url
-
+    url = "http://searx.titan/"
+    r = requests.get(url, data, headers=headers)
+    return r.json()["results"][0]["url"]
 
 with open("./example_song_list.txt", "r") as f:
     songs = []
