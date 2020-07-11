@@ -31,14 +31,13 @@ def find_song_url(query):
         'Accept-Language': 'en-US,en;q=0.5',
         'Origin': 'null',
         'Connection': 'keep-alive',
-        'Cookie': 'categories=general; language=en-US; locale=en; autocomplete=; image_proxy=; method=POST; safesearch=0; theme=oscar; results_on_new_tab=0; doi_resolver=oadoi.org; oscar-style=logicodev; disabled_engines="btdigg__music\054mixcloud__music\054soundcloud__music\054invidious__music\054seedpeer__music\054deezer__music\054genius__music\054torrentz__music\054piratebay__music"; enabled_engines=; disabled_plugins=; enabled_plugins=; tokens=',
+        "Cookie": "results_on_new_tab=0; safesearch=0; categories=general; oscar-style=logicodev; language=en-US; image_proxy=1; autocomplete=; theme=oscar; method=POST; disabled_engines=\"deezer__music\054torrentz__music\054mixcloud__music\054seedpeer__music\054invidious__music\054genius__music\054piratebay__music\054soundcloud__music\054btdigg__music\"; enabled_engines=; disabled_plugins=; enabled_plugins='",
         'Upgrade-Insecure-Requests': '1'
-
     }
 
-    data = f"category_general=1&{urllib.parse.urlencode({'q': query})}&pageno=1&time_range=None&language=en-US&format=json"
+    data = f"category_music=1&{urllib.parse.urlencode({'q': query})}&pageno=1&time_range=None&language=en-US&format=json"
 
-    url = "http://searx.titan/"
+    url = "https://searx.pofilo.fr/" ## @todo replace by a config['SEARX_INSTANCE']
     r = requests.get(url, data, headers=headers)
     return r.json()["results"][0]["url"]
 
