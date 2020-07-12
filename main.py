@@ -37,14 +37,14 @@ def find_song_url(query):
         "Upgrade-Insecure-Requests": "1",
     }
 
-    data = f"category_music=1&{urllib.parse.urlencode({'q': query})}&pageno=1&time_range=None&language=en-US&format=csv"
+    data = f"category_music=1&{urllib.parse.urlencode({'q': query})}&pageno=1&time_range=None&language=en-US&format=json"
 
     url = "https://search.fuckoffgoogle.net/"  ## @todo replace by a config['SEARX_INSTANCE']
-    response = requests.get(url, data, headers=headers)
-    for line in response.text.split("\n"):
-        title, url, content, host, engine, score, _type = line.split(",")
-        if engine == "youtube":  # @todo and score > threshold
-            return url
+    response = requests.get(url, data, headers=headers).json()
+    for result in response["results"]:
+        #title, url, content, host, engine, score, _type = line.split(",")
+        if result["engine"] == "youtube":  # @todo and score > threshold
+            return result["url"]
 
     return None
 
