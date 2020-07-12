@@ -6,7 +6,7 @@
 
 ** Installation
 
-Be sure to have Firefox and Python 3.6+ installed.
+Python 3.6+ must be installed.
 
 
 *** Create a virtualenv 
@@ -29,14 +29,11 @@ pip install -r requirements.txt
 
 /!\ Be sure to always have the last version of =youtube-dl=.
 
-*** Download [[https://github.com/mozilla/geckodriver/releases][geckodriver]] 
-
-Place the geckodriver binary in the =venv/bin= folder or anywhere that is in the =PATH=.
 
 
 ** Usage 
 1. Fill the example_song_list.txt file with your track list (use the same format aka =song|artist=, one per line)
-2. run =python main.py=, this will open the browser to find the URL of the song on YouTube Music and then download the mp3 using =youtube-dl=.
+2. run =python main.py=, it will use searx to to find the URL of the song on YouTube Music and then download the mp3 using =youtube-dl=.
 
 
 ** Disclaimer
