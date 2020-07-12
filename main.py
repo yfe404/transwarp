@@ -18,10 +18,10 @@ logging.basicConfig(
 
 def find_song_url(query):
     """
-    Use Selenium to go to YouTube Music and search for a song
+    Use SearX to search for a song on YouTube
 
     :param query: The query describing the song to look for (exemple artist and title)
-    :return: The URL of the song on YouTube Music to be sent to youtube-dl
+    :return: The URL of the song on YouTube to be sent to youtube-dl
     """
 
     headers = {
