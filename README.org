@@ -1,8 +1,19 @@
 * Transwarp
 
-#+ATTR_HTML: :style margin-left: auto; margin-right: auto;
-[[./images/zun_is_not_dead.jpg]]
-
+ 
+       ________________________________         
+      /                                "-_          
+     /      .  |  .    Spotify,           \          
+    /      : \ | / :   YouTube,            \         
+   /        '-___-'    Deezer...            \      
+  /_________________________________________ \      
+       _______| |________________________--""-L 
+      /       F J                              \ 
+     /       F   J                              L
+    /      :'     ':   Your library             F
+   /        '-___-'                            / 
+  /_________________________________________--"  
+ 
 
 ** Installation
 
