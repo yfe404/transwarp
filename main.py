@@ -12,8 +12,10 @@ from retrying import retry
 from config import youtube_config
 
 logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(levelname)s: %(message)s"
 )
+
+logger = logging.getLogger('main')
 
 
 def find_song_url(query):
@@ -41,20 +43,33 @@ def find_song_url(query):
     response = requests.get(url, data, headers=headers)
     for line in response.text.split("\n"):
         title, url, content, host, engine, score, _type = line.split(",")
-        if engine == "www.youtube.com":  # @todo and score > threshold
+        if engine == "youtube":  # @todo and score > threshold
             return url
 
     return None
 
 
+def check_playlist_file(path):#@todo
+    logger.info(f"Checking and removing any duplicate tracks in {path}")
+    return True
+
+check_playlist_file("./example_song_list.txt")
+
 with open("./example_song_list.txt", "r") as f:
+#INFO: Downloading 67 tracks.
+
+#INFO: 1. Downloading "https://open.spotify.com/track/0sCeNwt8xRCMR4NhKpMyBe"
+
     songs = []
     for line in f.readlines():
         title, artist = line.strip().split("|")
         songs.append((title, artist))
 
-    for song in songs:
+    logger.info(f"Downloading {len(songs)} tracks.")
+
+    for idx, song in enumerate(songs):
         query = f"{song[0]} {song[1]}"
+        logger.info(f"{idx+1}. Downloading {song[1]} from {song[0]}")
 
         song_url = find_song_url(query)
         pos = song_url.find("&list")

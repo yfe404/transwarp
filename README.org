@@ -38,12 +38,3 @@ pip install -r requirements.txt
 
 ** Disclaimer
 Downloading copyrighted songs may be illegal in your country. This tool is for educational purposes bla bla bla... Please support the artists by buying their music.
-
-
-
-
-
-
-
-
-
